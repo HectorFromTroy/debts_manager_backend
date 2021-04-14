@@ -32,9 +32,8 @@ public class DetailsService implements UserDetailsService {
         return new SpringUser(user);
     }
 
-    public MyUser getCurrentUser() {
-        SpringUser springUser = (SpringUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return springUser.getUser();
+    public Optional<MyUser> findUserById(long id) {
+        return userRepository.findById(id);
     }
 
     public Optional<MyUser> findByUsername(String username) {

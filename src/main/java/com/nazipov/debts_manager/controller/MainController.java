@@ -1,17 +1,20 @@
 package com.nazipov.debts_manager.controller;
 
 import com.nazipov.debts_manager.dto.SampleResponseDto;
+import com.nazipov.debts_manager.entities.Debtship;
 import com.nazipov.debts_manager.entities.MyUser;
 import com.nazipov.debts_manager.service.DetailsService;
 import com.nazipov.debts_manager.service.SpringUser;
+import com.nazipov.debts_manager.service.debtship.DebtshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.security.Principal;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 public class MainController {
@@ -31,10 +34,14 @@ public class MainController {
     }
 
     private final DetailsService detailsService;
+    private final DebtshipService debtshipService;
 
     @Autowired
-    MainController(DetailsService detailsService) {
+    MainController(
+            DetailsService detailsService,
+            DebtshipService debtshipService) {
         this.detailsService = detailsService;
+        this.debtshipService = debtshipService;
     }
 
     @GetMapping("/user")
@@ -46,24 +53,41 @@ public class MainController {
                 .build();
     }
 
+    @GetMapping("/get_debtors")
+    public SampleResponseDto<?> getDebtors(@AuthenticationPrincipal SpringUser springUser) {
+        MyUser user = springUser.getUser();
+        Optional<Set<Debtship>> debtshipsOpt = debtshipService.getUserDebtorsById(user.getId());
+        // even if there is no debtors, optional will contain empty set anyway
+        Set<Debtship> debtships = debtshipsOpt.get();
+        Set<MyUser> debtors = debtships.stream().map(Debtship::getDebtor).collect(Collectors.toSet());
+        return new SampleResponseDto.Builder<Set<MyUser>>()
+                .setStatus(true)
+                .setData(debtors)
+                .build();
+    }
+
     @PostMapping("/add_debtor")
     public SampleResponseDto<?> addDebtor(
             @RequestBody AddDebtorRequest addDebtorRequest,
             @AuthenticationPrincipal SpringUser springUser) {
         MyUser user = springUser.getUser();
-        // create dumb user if not real
-//        int userId = addDebtorRequest.getUserId();
-//        MyUser savedUser = null;
-//        if (userId == 0) {
-//            MyUser user = new MyUser();
-//            user.setName(addDebtorRequest.getName());
-//            savedUser = detailsService.saveUser(user);
-//        }
-//        if (savedUser == null) {
-//
-//        }
-        // add in debtship
-        return new SampleResponseDto<>();
+        Optional<MyUser> debtorOpt = detailsService.findUserById(
+                addDebtorRequest.getDebtorId()
+        );
+        MyUser debtor = null;
+        if (debtorOpt.isPresent()) {
+            debtor = debtorOpt.get();
+        } else {
+            debtor = new MyUser();
+            debtor.setName(addDebtorRequest.getName());
+            debtor = detailsService.saveUser(debtor);
+        }
+
+        debtshipService.saveDebtship(user, debtor);
+
+        return new SampleResponseDto.Builder<>()
+                .setStatus(true)
+                .build();
     }
 
     public static class AddDebtorRequest {
