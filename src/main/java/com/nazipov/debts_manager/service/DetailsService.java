@@ -1,6 +1,6 @@
 package com.nazipov.debts_manager.service;
 
-import com.nazipov.debts_manager.entities.User;
+import com.nazipov.debts_manager.entities.MyUser;
 import com.nazipov.debts_manager.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,30 +23,26 @@ public class DetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> userOpt = userRepository.findByUsername(username);
+        Optional<MyUser> userOpt = userRepository.findByUsername(username);
         if (userOpt.isEmpty()){
             throw new UsernameNotFoundException(username + " was not found");
         }
 
-        User user = userOpt.get();
-        return new UserDetailsImpl(
-                    user.getId(),
-                    user.getUsername(),
-                    user.getPassword()
-                );
+        MyUser user = userOpt.get();
+        return new SpringUser(user);
     }
 
-    public Long getCurrentUserId() {
-        UserDetailsImpl user = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return user.getId();
+    public MyUser getCurrentUser() {
+        SpringUser springUser = (SpringUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return springUser.getUser();
     }
 
-    public Optional<User> findByUsername(String username) {
+    public Optional<MyUser> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
-    public User saveUser(User user) {
-        Optional<User> userFromDb = userRepository.findByUsername(user.getUsername());
+    public MyUser saveUser(MyUser user) {
+        Optional<MyUser> userFromDb = userRepository.findByUsername(user.getUsername());
         if (userFromDb.isPresent()) {
             // user already exists
             return null;

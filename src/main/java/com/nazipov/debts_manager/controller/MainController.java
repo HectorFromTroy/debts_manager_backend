@@ -1,10 +1,11 @@
 package com.nazipov.debts_manager.controller;
 
 import com.nazipov.debts_manager.dto.SampleResponseDto;
-import com.nazipov.debts_manager.entities.User;
+import com.nazipov.debts_manager.entities.MyUser;
 import com.nazipov.debts_manager.service.DetailsService;
-import com.nazipov.debts_manager.service.UserDetailsImpl;
+import com.nazipov.debts_manager.service.SpringUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,9 +38,9 @@ public class MainController {
     }
 
     @GetMapping("/user")
-    public SampleResponseDto<User> getUser() {
-        Optional<User> u = detailsService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        return new SampleResponseDto.Builder<User>()
+    public SampleResponseDto<MyUser> getUser() {
+        Optional<MyUser> u = detailsService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        return new SampleResponseDto.Builder<MyUser>()
                 .setStatus(true)
                 .setData(u.get())
                 .build();
@@ -47,13 +48,14 @@ public class MainController {
 
     @PostMapping("/add_debtor")
     public SampleResponseDto<?> addDebtor(
-            @RequestBody AddDebtorRequest addDebtorRequest) {
-        long currentUserId = detailsService.getCurrentUserId();
+            @RequestBody AddDebtorRequest addDebtorRequest,
+            @AuthenticationPrincipal SpringUser springUser) {
+        MyUser user = springUser.getUser();
         // create dumb user if not real
 //        int userId = addDebtorRequest.getUserId();
-//        User savedUser = null;
+//        MyUser savedUser = null;
 //        if (userId == 0) {
-//            User user = new User();
+//            MyUser user = new MyUser();
 //            user.setName(addDebtorRequest.getName());
 //            savedUser = detailsService.saveUser(user);
 //        }

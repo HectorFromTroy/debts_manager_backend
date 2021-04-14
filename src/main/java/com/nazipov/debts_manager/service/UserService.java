@@ -1,8 +1,8 @@
 package com.nazipov.debts_manager.service;
 
-import com.nazipov.debts_manager.entities.User;
+import com.nazipov.debts_manager.entities.MyUser;
 
 public interface UserService {
-    User read(long id);
-    User findByUsername(String name);
+    MyUser read(long id);
+    MyUser findByUsername(String name);
 }

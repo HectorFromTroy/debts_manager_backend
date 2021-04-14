@@ -17,7 +17,7 @@ public class Debtship {
 //    @JoinColumn(name = "id", foreignKey = @ForeignKey(name = "user_id"))
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private MyUser user;
 
 //    @Column(name = "debtor_id")
 //    private Long debtor_id;
@@ -25,7 +25,7 @@ public class Debtship {
 //    @JoinColumn(name = "id", foreignKey = @ForeignKey(name = "debtor_id"))
     @ManyToOne
     @JoinColumn(name = "debtor_id")
-    private User debtor;
+    private MyUser debtor;
 
     public void setId(Long id) {
         this.id = id;
@@ -35,19 +35,19 @@ public class Debtship {
         return id;
     }
 
-    public User getUser() {
+    public MyUser getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(MyUser user) {
         this.user = user;
     }
 
-    public User getDebtor() {
+    public MyUser getDebtor() {
         return debtor;
     }
 
-    public void setDebtor(User debtor) {
+    public void setDebtor(MyUser debtor) {
         this.debtor = debtor;
     }
 }
