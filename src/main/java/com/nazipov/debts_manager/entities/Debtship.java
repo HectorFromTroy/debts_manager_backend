@@ -1,6 +1,10 @@
 package com.nazipov.debts_manager.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.List;
+import java.util.TreeSet;
 
 @Entity
 @Table(name = "debtship")
@@ -11,21 +15,18 @@ public class Debtship {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @Column(name = "user_id")
-//    private Long user_id;
-//    @OneToOne
-//    @JoinColumn(name = "id", foreignKey = @ForeignKey(name = "user_id"))
     @ManyToOne
     @JoinColumn(name = "user_id")
     private MyUser user;
 
-//    @Column(name = "debtor_id")
-//    private Long debtor_id;
-//    @OneToOne
-//    @JoinColumn(name = "id", foreignKey = @ForeignKey(name = "debtor_id"))
     @ManyToOne
     @JoinColumn(name = "debtor_id")
     private MyUser debtor;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "debtship")
+    @OrderBy("date ASC")
+    private List<Debt> debts;
 
     public void setId(Long id) {
         this.id = id;
@@ -49,5 +50,13 @@ public class Debtship {
 
     public void setDebtor(MyUser debtor) {
         this.debtor = debtor;
+    }
+
+    public List<Debt> getDebts() {
+        return debts;
+    }
+
+    public void addDebt(Debt debt) {
+        debts.add(debt);
     }
 }

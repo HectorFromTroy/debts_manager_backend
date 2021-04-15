@@ -1,5 +1,9 @@
 package com.nazipov.debts_manager.dto;
 
+import com.nazipov.debts_manager.entities.Debt;
+
+import java.util.List;
+
 public class SampleResponseDto <DataType> {
     // response status
     private boolean status;

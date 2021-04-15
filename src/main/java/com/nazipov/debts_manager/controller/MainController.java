@@ -5,6 +5,7 @@ import com.nazipov.debts_manager.entities.Debtship;
 import com.nazipov.debts_manager.entities.MyUser;
 import com.nazipov.debts_manager.service.DetailsService;
 import com.nazipov.debts_manager.service.SpringUser;
+import com.nazipov.debts_manager.service.debtship.AddDebtorRequest;
 import com.nazipov.debts_manager.service.debtship.DebtshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,20 +20,6 @@ import java.util.stream.Collectors;
 @RestController
 public class MainController {
 
-    @GetMapping("/")
-    public String authorization() {
-        return "SOOQA";
-    }
-
-    @GetMapping("/login")
-    public SampleResponseDto<?> login(HttpServletResponse response) {
-        // if spring security allows to get here => login was successful
-        response.setStatus(HttpServletResponse.SC_OK);
-        SampleResponseDto<Long> responseDto = new SampleResponseDto<>();
-        responseDto.setStatus(true);
-        return responseDto;
-    }
-
     private final DetailsService detailsService;
     private final DebtshipService debtshipService;
 
@@ -42,6 +29,15 @@ public class MainController {
             DebtshipService debtshipService) {
         this.detailsService = detailsService;
         this.debtshipService = debtshipService;
+    }
+
+    @GetMapping("/login")
+    public SampleResponseDto<?> login(HttpServletResponse response) {
+        // if spring security allows to get here => login was successful
+        response.setStatus(HttpServletResponse.SC_OK);
+        SampleResponseDto<Long> responseDto = new SampleResponseDto<>();
+        responseDto.setStatus(true);
+        return responseDto;
     }
 
     @GetMapping("/user")
@@ -59,7 +55,9 @@ public class MainController {
         Optional<Set<Debtship>> debtshipsOpt = debtshipService.getUserDebtorsById(user.getId());
         // even if there is no debtors, optional will contain empty set anyway
         Set<Debtship> debtships = debtshipsOpt.get();
-        Set<MyUser> debtors = debtships.stream().map(Debtship::getDebtor).collect(Collectors.toSet());
+        Set<MyUser> debtors = debtships.stream()
+                .map(Debtship::getDebtor)
+                .collect(Collectors.toSet());
         return new SampleResponseDto.Builder<Set<MyUser>>()
                 .setStatus(true)
                 .setData(debtors)
@@ -88,21 +86,5 @@ public class MainController {
         return new SampleResponseDto.Builder<>()
                 .setStatus(true)
                 .build();
-    }
-
-    public static class AddDebtorRequest {
-        private final int debtorId;
-        private final String name;
-        public AddDebtorRequest(int debtorId, String name) {
-            this.debtorId = debtorId;
-            this.name = name;
-        }
-
-        public int getDebtorId() {
-            return debtorId;
-        }
-        public String getName() {
-            return name;
-        }
     }
 }

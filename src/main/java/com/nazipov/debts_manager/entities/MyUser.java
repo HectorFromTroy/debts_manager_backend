@@ -26,32 +26,6 @@ public class MyUser {
     @Column(name = "password")
     private String password;
 
-//    @JsonIgnore
-//    @ManyToMany(fetch = FetchType.EAGER)
-//    @JoinTable(
-//            name = "debtship",
-//            joinColumns = @JoinColumn(name = "user_id"),
-//            inverseJoinColumns = @JoinColumn(name = "debtor_id")
-//    )
-//    private Set<MyUser> debtors = new HashSet<>();
-//
-//    @JsonIgnore
-//    @ManyToMany
-//    @JoinTable(
-//            name = "debtship",
-//            joinColumns = @JoinColumn(name = "debtor_id"),
-//            inverseJoinColumns = @JoinColumn(name = "user_id")
-//    )
-//    private Set<MyUser> debtorOf = new HashSet<>();
-//
-//    public Set<MyUser> getDebtors() {
-//        return debtors;
-//    }
-//
-//    public void addDebtor(MyUser debtor) {
-//        debtors.add(debtor);
-//    }
-
     public Long getId() {
         return id;
     }

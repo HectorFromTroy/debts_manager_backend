@@ -18,6 +18,14 @@ public class DebtshipService {
         this.debtshipRepository = debtshipRepository;
     }
 
+    public Optional<Debtship> getDebtshipByUserAndDebtorId(long userId, long debtorId) {
+        return debtshipRepository.getDebtshipByUserAndDebtorId(userId, debtorId);
+    }
+
+    public Optional<Debtship> getDebtshipById(long debtshipId) {
+        return debtshipRepository.findById(debtshipId);
+    }
+
     public Optional<Set<Debtship>> getUserDebtorsById(long userId) {
         return debtshipRepository.getUserDebtorsById(userId);
     }
