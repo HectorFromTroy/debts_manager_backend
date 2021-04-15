@@ -8,6 +8,7 @@ INSERT INTO debtship
 VALUES
 (100, 100, 200), -- durak niyazu
 (200, 100, 300), -- samat niyazu
+(400, 300, 100), -- niyaz samatu
 (300, 200, 100); -- niyaz duraku
 
 INSERT INTO debt
@@ -41,6 +42,11 @@ VALUES
   'SAMAT NIYAZU',
   '11-10-20',
   200, '11-15-20', 'vernul'
+),
+( 700, 400, 400,
+  'Niyaz samatu',
+  '11-10-20',
+  0, null, null
 );
 
 -- INSERT INTO debt

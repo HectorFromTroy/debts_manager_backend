@@ -1,9 +1,5 @@
 package com.nazipov.debts_manager.dto;
 
-import com.nazipov.debts_manager.entities.Debt;
-
-import java.util.List;
-
 public class SampleResponseDto <DataType> {
     // response status
     private boolean status;
@@ -42,6 +38,10 @@ public class SampleResponseDto <DataType> {
 
     public void setError(String e) {
         error = e;
+    }
+
+    public static SampleResponseDto<?> statusTrue() {
+        return new Builder<>().setStatus(true).build();
     }
 
     public static class Builder <DataType> {

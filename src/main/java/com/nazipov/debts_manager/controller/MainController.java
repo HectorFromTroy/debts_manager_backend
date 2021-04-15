@@ -35,9 +35,7 @@ public class MainController {
     public SampleResponseDto<?> login(HttpServletResponse response) {
         // if spring security allows to get here => login was successful
         response.setStatus(HttpServletResponse.SC_OK);
-        SampleResponseDto<Long> responseDto = new SampleResponseDto<>();
-        responseDto.setStatus(true);
-        return responseDto;
+        return SampleResponseDto.statusTrue();
     }
 
     @GetMapping("/user")
@@ -83,8 +81,6 @@ public class MainController {
 
         debtshipService.saveDebtship(user, debtor);
 
-        return new SampleResponseDto.Builder<>()
-                .setStatus(true)
-                .build();
+        return SampleResponseDto.statusTrue();
     }
 }

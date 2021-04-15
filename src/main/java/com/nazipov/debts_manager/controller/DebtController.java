@@ -7,6 +7,7 @@ import com.nazipov.debts_manager.entities.MyUser;
 import com.nazipov.debts_manager.service.SpringUser;
 import com.nazipov.debts_manager.service.debt.AddDebtRequest;
 import com.nazipov.debts_manager.service.debt.DebtService;
+import com.nazipov.debts_manager.service.debt.RepayDebtRequest;
 import com.nazipov.debts_manager.service.debtship.DebtshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,6 +25,27 @@ public class DebtController {
     DebtController(DebtshipService debtshipService, DebtService debtService) {
         this.debtshipService = debtshipService;
         this.debtService = debtService;
+    }
+
+    private SampleResponseDto<?> noAccessOnDebt() {
+        return new SampleResponseDto.Builder<>()
+                .setStatus(false)
+                .setError("You have no permits on this debt")
+                .build();
+    }
+
+    private SampleResponseDto<?> noSuchDebt() {
+        return new SampleResponseDto.Builder<>()
+                .setStatus(false)
+                .setError("No such debt")
+                .build();
+    }
+
+    private boolean checkNoAccessOnDebt(SpringUser springUser, Debt debt) {
+        MyUser user = debt.getDebtship().getUser();
+        return !user.getId()
+                .equals(springUser.getUser().getId())
+                && user.getUsername() != null;
     }
 
     // TODO refactor with add_debt
@@ -52,22 +74,19 @@ public class DebtController {
     public SampleResponseDto<?> addDebt(
             @RequestBody AddDebtRequest addDebtRequest,
             @AuthenticationPrincipal SpringUser springUser) {
-        MyUser user = springUser.getUser();
         Optional<Debtship> debtshipOptional = debtshipService
                 .getDebtshipById(addDebtRequest.getDebtship_id());
         if (debtshipOptional.isPresent()) {
             Debtship debtship = debtshipOptional.get();
             if (debtship.getUser().getId()
-                    .equals(user.getId())) {
+                    .equals(springUser.getUser().getId())) {
                 Debt debt = new Debt();
                 debt.setDebtship(debtship);
                 debt.setDescription(addDebtRequest.getDescription());
                 debt.setDate(addDebtRequest.getDate());
                 debt.setSum(addDebtRequest.getSum());
                 debtService.saveDebt(debt);
-                return new SampleResponseDto.Builder<>()
-                        .setStatus(true)
-                        .build();
+                return SampleResponseDto.statusTrue();
             } else {
                 return new SampleResponseDto.Builder<>()
                         .setStatus(false)
@@ -79,6 +98,51 @@ public class DebtController {
                     .setStatus(false)
                     .setError("No such relation between user and debtor")
                     .build();
+        }
+    }
+
+    @GetMapping("/delete_debt")
+    public SampleResponseDto<?> deleteDebt(
+            @RequestParam(required = true) long debtId,
+            @AuthenticationPrincipal SpringUser springUser
+    ) {
+        Optional<Debt> debtOptional = debtService.getDebtById(debtId);
+
+        if (debtOptional.isPresent()) {
+            Debt debt = debtOptional.get();
+
+            if (checkNoAccessOnDebt(springUser, debt)) {
+                return noAccessOnDebt();
+            }
+            // TODO static true response factory
+            debtService.deleteDebt(debt);
+            return SampleResponseDto.statusTrue();
+        } else {
+            return noSuchDebt();
+        }
+    }
+
+    @PostMapping("/repay_debt")
+    public SampleResponseDto<?> repayDebt(
+            @RequestBody RepayDebtRequest repayDebtRequest,
+            @AuthenticationPrincipal SpringUser springUser
+    ) {
+        Optional<Debt> debtOptional = debtService.getDebtById(repayDebtRequest.getDebtId());
+
+        if (debtOptional.isPresent()) {
+            Debt debt = debtOptional.get();
+
+            if (checkNoAccessOnDebt(springUser, debt)) {
+                return noAccessOnDebt();
+            }
+
+            debt.setRepaySum(debt.getSum());
+            debt.setRepayDescription(repayDebtRequest.getRepayDescription());
+            debt.setRepayDate(repayDebtRequest.getRepayDate());
+            debtService.saveDebt(debt);
+            return SampleResponseDto.statusTrue();
+        } else {
+            return noSuchDebt();
         }
     }
 }
