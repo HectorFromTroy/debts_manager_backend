@@ -1,6 +1,7 @@
 package com.nazipov.debts_manager.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.List;
@@ -27,6 +28,12 @@ public class Debtship {
     @OneToMany(mappedBy = "debtship")
     @OrderBy("date ASC")
     private List<Debt> debts;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "debtship")
+    @Where(clause = "sum != repay_sum")
+    @OrderBy("date ASC")
+    private List<Debt> activeDebts;
 
     public void setId(Long id) {
         this.id = id;
@@ -56,7 +63,7 @@ public class Debtship {
         return debts;
     }
 
-    public void addDebt(Debt debt) {
-        debts.add(debt);
+    public List<Debt> getActiveDebts() {
+        return activeDebts;
     }
 }

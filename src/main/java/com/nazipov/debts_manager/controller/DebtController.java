@@ -53,7 +53,8 @@ public class DebtController {
     @GetMapping("/get_all_debts")
     public SampleResponseDto<List<Debt>> getAllDebts(
             @RequestParam(required = true) long debtorId,
-            @AuthenticationPrincipal SpringUser springUser) {
+            @AuthenticationPrincipal SpringUser springUser
+    ) {
         MyUser user = springUser.getUser();
         // mb get debtship by id and then check user id
         Optional<Debtship> debtshipOptional = debtshipService
@@ -68,6 +69,34 @@ public class DebtController {
             response.setError("Нет такого отношения между пользователем и должником");
         }
         return response;
+    }
+
+    @GetMapping("/get_all_active_debts")
+    public SampleResponseDto<?> getAllActiveDebts(
+            @RequestParam(required = true) long debtshipId,
+            @AuthenticationPrincipal SpringUser springUser
+    ) {
+        Optional<Debtship> debtshipOptional = debtshipService.getDebtshipById(debtshipId);
+        if (debtshipOptional.isPresent()) {
+            Debtship debtship = debtshipOptional.get();
+            if (!debtship.getUser().getId().equals(springUser.getUser().getId())) {
+                return new SampleResponseDto.Builder<>()
+                        .setStatus(false)
+                        .setError("Отношение не принадлежит пользователю")
+                        .build();
+            }
+            List<Debt> activeDebts = debtship.getActiveDebts();
+            // TODO json ignore debtship on debt entity
+            return new SampleResponseDto.Builder<>()
+                    .setStatus(true)
+                    .setData(activeDebts)
+                    .build();
+        } else {
+            return new SampleResponseDto.Builder<>()
+                    .setStatus(false)
+                    .setError("Нет такого отношения")
+                    .build();
+        }
     }
 
     // TODO refactor with get all debts
