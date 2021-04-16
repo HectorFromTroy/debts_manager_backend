@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,14 +31,14 @@ public class DebtController {
     private SampleResponseDto<?> noAccessOnDebt() {
         return new SampleResponseDto.Builder<>()
                 .setStatus(false)
-                .setError("You have no permits on this debt")
+                .setError("У вас нет доступа к этому долгу")
                 .build();
     }
 
     private SampleResponseDto<?> noSuchDebt() {
         return new SampleResponseDto.Builder<>()
                 .setStatus(false)
-                .setError("No such debt")
+                .setError("Нет такого долга")
                 .build();
     }
 
@@ -64,7 +65,7 @@ public class DebtController {
             List<Debt> debts = debtshipOptional.get().getDebts();
             response.setData(debts);
         } else {
-            response.setError("No such relation between user and debtor");
+            response.setError("Нет такого отношения между пользователем и должником");
         }
         return response;
     }
@@ -74,31 +75,41 @@ public class DebtController {
     public SampleResponseDto<?> addDebt(
             @RequestBody AddDebtRequest addDebtRequest,
             @AuthenticationPrincipal SpringUser springUser) {
-        Optional<Debtship> debtshipOptional = debtshipService
-                .getDebtshipById(addDebtRequest.getDebtship_id());
-        if (debtshipOptional.isPresent()) {
-            Debtship debtship = debtshipOptional.get();
-            if (debtship.getUser().getId()
-                    .equals(springUser.getUser().getId())) {
-                Debt debt = new Debt();
-                debt.setDebtship(debtship);
-                debt.setDescription(addDebtRequest.getDescription());
-                debt.setDate(addDebtRequest.getDate());
-                debt.setSum(addDebtRequest.getSum());
-                debtService.saveDebt(debt);
-                return SampleResponseDto.statusTrue();
+
+        long currentUserId = springUser.getUser().getId();
+        String description = addDebtRequest.getDescription();
+        LocalDate date = addDebtRequest.getDate();
+        int sum = addDebtRequest.getSum();
+
+        long[] debtshipIds = addDebtRequest.getDebtship_id();
+
+        for (long debtshipId : debtshipIds) {
+            Optional<Debtship> debtshipOptional = debtshipService
+                    .getDebtshipById(debtshipId);
+            if (debtshipOptional.isPresent()) {
+                Debtship debtship = debtshipOptional.get();
+                if (debtship.getUser().getId()
+                        .equals(currentUserId)) {
+                    Debt debt = new Debt();
+                    debt.setDebtship(debtship);
+                    debt.setDescription(description);
+                    debt.setDate(date);
+                    debt.setSum(sum);
+                    debtService.saveDebt(debt);
+                } else {
+                    return new SampleResponseDto.Builder<>()
+                            .setStatus(false)
+                            .setError("Одно или несколько отношений не принадлежат пользователю")
+                            .build();
+                }
             } else {
                 return new SampleResponseDto.Builder<>()
                         .setStatus(false)
-                        .setError("Not current users relation")
+                        .setError("Нет такого отношения между пользователем и должником")
                         .build();
             }
-        } else {
-            return new SampleResponseDto.Builder<>()
-                    .setStatus(false)
-                    .setError("No such relation between user and debtor")
-                    .build();
         }
+        return SampleResponseDto.statusTrue();
     }
 
     @GetMapping("/delete_debt")
@@ -114,7 +125,6 @@ public class DebtController {
             if (checkNoAccessOnDebt(springUser, debt)) {
                 return noAccessOnDebt();
             }
-            // TODO static true response factory
             debtService.deleteDebt(debt);
             return SampleResponseDto.statusTrue();
         } else {
