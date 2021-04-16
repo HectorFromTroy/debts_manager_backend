@@ -6,6 +6,7 @@ import com.nazipov.debts_manager.repositories.DebtRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +25,10 @@ public class DebtService {
 
     public Debt saveDebt(Debt debt) {
         return debtRepository.save(debt);
+    }
+
+    public Iterable<Debt> saveAllDebts(List<Debt> debts) {
+        return debtRepository.saveAll(debts);
     }
 
     public void deleteDebt(Debt debt) {

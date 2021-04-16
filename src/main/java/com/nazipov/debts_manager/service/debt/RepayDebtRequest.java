@@ -1,18 +1,20 @@
 package com.nazipov.debts_manager.service.debt;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+
 import java.time.LocalDate;
 
+@JsonSubTypes(value = {
+        @JsonSubTypes.Type(value = RepaySpecificDebt.class),
+        @JsonSubTypes.Type(value = RepayDebtsByCommonSum.class)
+})
 public class RepayDebtRequest {
-    private final Long debtId;
     private final String repayDescription;
     private final LocalDate repayDate;
-    private final Integer repaySum;
 
-    public RepayDebtRequest(Long debtId, String repayDescription, LocalDate repayDate, Integer repaySum) {
-        this.debtId = debtId;
+    public RepayDebtRequest(String repayDescription, LocalDate repayDate) {
         this.repayDescription = repayDescription;
         this.repayDate = repayDate;
-        this.repaySum = repaySum;
     }
 
     public String getRepayDescription() {
@@ -21,13 +23,5 @@ public class RepayDebtRequest {
 
     public LocalDate getRepayDate() {
         return repayDate;
-    }
-
-    public Integer getRepaySum() {
-        return repaySum;
-    }
-
-    public Long getDebtId() {
-        return debtId;
     }
 }

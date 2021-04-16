@@ -8,12 +8,14 @@ import com.nazipov.debts_manager.service.SpringUser;
 import com.nazipov.debts_manager.service.debt.AddDebtRequest;
 import com.nazipov.debts_manager.service.debt.DebtService;
 import com.nazipov.debts_manager.service.debt.RepayDebtRequest;
+import com.nazipov.debts_manager.service.debt.RepaySpecificDebt;
 import com.nazipov.debts_manager.service.debtship.DebtshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,31 +51,10 @@ public class DebtController {
                 && user.getUsername() != null;
     }
 
-    // TODO refactor with add_debt
-    @GetMapping("/get_all_debts")
-    public SampleResponseDto<List<Debt>> getAllDebts(
-            @RequestParam(required = true) long debtorId,
-            @AuthenticationPrincipal SpringUser springUser
-    ) {
-        MyUser user = springUser.getUser();
-        // mb get debtship by id and then check user id
-        Optional<Debtship> debtshipOptional = debtshipService
-                .getDebtshipByUserAndDebtorId(user.getId(), debtorId);
-        boolean isPresent = debtshipOptional.isPresent();
-        SampleResponseDto<List<Debt>> response = new SampleResponseDto<>();
-        response.setStatus(isPresent);
-        if (isPresent) {
-            List<Debt> debts = debtshipOptional.get().getDebts();
-            response.setData(debts);
-        } else {
-            response.setError("Нет такого отношения между пользователем и должником");
-        }
-        return response;
-    }
-
-    @GetMapping("/get_all_active_debts")
+    @GetMapping("/get_debts")
     public SampleResponseDto<?> getAllActiveDebts(
             @RequestParam(required = true) long debtshipId,
+            @RequestParam(required = true) boolean active,
             @AuthenticationPrincipal SpringUser springUser
     ) {
         Optional<Debtship> debtshipOptional = debtshipService.getDebtshipById(debtshipId);
@@ -85,11 +66,18 @@ public class DebtController {
                         .setError("Отношение не принадлежит пользователю")
                         .build();
             }
-            List<Debt> activeDebts = debtship.getActiveDebts();
-            // TODO json ignore debtship on debt entity
+
+            List<Debt> debts = null;
+
+            if (active) {
+                debts = debtship.getActiveDebts();
+            } else {
+                debts = debtship.getDebts();
+            }
+
             return new SampleResponseDto.Builder<>()
                     .setStatus(true)
-                    .setData(activeDebts)
+                    .setData(debts)
                     .build();
         } else {
             return new SampleResponseDto.Builder<>()
@@ -99,7 +87,6 @@ public class DebtController {
         }
     }
 
-    // TODO refactor with get all debts
     @PostMapping("/add_debt")
     public SampleResponseDto<?> addDebt(
             @RequestBody AddDebtRequest addDebtRequest,
@@ -112,19 +99,25 @@ public class DebtController {
 
         long[] debtshipIds = addDebtRequest.getDebtship_id();
 
+        List<Debt> debtsToAdd = new ArrayList<>();
+
         for (long debtshipId : debtshipIds) {
             Optional<Debtship> debtshipOptional = debtshipService
                     .getDebtshipById(debtshipId);
             if (debtshipOptional.isPresent()) {
                 Debtship debtship = debtshipOptional.get();
-                if (debtship.getUser().getId()
-                        .equals(currentUserId)) {
+                // мне должны или я должен не настоящему юзеру
+                if (debtship.getUser().getId().equals(currentUserId)
+                        || (debtship.getDebtor().getId().equals(currentUserId)
+                            && debtship.getUser().getUsername() == null
+                        )
+                ) {
                     Debt debt = new Debt();
                     debt.setDebtship(debtship);
                     debt.setDescription(description);
                     debt.setDate(date);
                     debt.setSum(sum);
-                    debtService.saveDebt(debt);
+                    debtsToAdd.add(debt);
                 } else {
                     return new SampleResponseDto.Builder<>()
                             .setStatus(false)
@@ -138,6 +131,7 @@ public class DebtController {
                         .build();
             }
         }
+        debtService.saveAllDebts(debtsToAdd);
         return SampleResponseDto.statusTrue();
     }
 
@@ -163,10 +157,10 @@ public class DebtController {
 
     @PostMapping("/repay_debt")
     public SampleResponseDto<?> repayDebt(
-            @RequestBody RepayDebtRequest repayDebtRequest,
+            @RequestBody RepaySpecificDebt repaySpecificDebt,
             @AuthenticationPrincipal SpringUser springUser
     ) {
-        Optional<Debt> debtOptional = debtService.getDebtById(repayDebtRequest.getDebtId());
+        Optional<Debt> debtOptional = debtService.getDebtById(repaySpecificDebt.getDebtId());
 
         if (debtOptional.isPresent()) {
             Debt debt = debtOptional.get();
@@ -176,8 +170,8 @@ public class DebtController {
             }
 
             debt.setRepaySum(debt.getSum());
-            debt.setRepayDescription(repayDebtRequest.getRepayDescription());
-            debt.setRepayDate(repayDebtRequest.getRepayDate());
+            debt.setRepayDescription(repaySpecificDebt.getRepayDescription());
+            debt.setRepayDate(repaySpecificDebt.getRepayDate());
             debtService.saveDebt(debt);
             return SampleResponseDto.statusTrue();
         } else {
