@@ -33,8 +33,8 @@ public class DebtService {
         return debtRepository.findAllByDebtship(debtship, pageable);
     }
 
-    public List<Debt> findAllByDebtshipAndAndIsPaidOff(Debtship debtship, boolean isPaidOff, Pageable pageable) {
-        return debtRepository.findAllByDebtshipAndAndIsPaidOff(debtship, isPaidOff, pageable);
+    public List<Debt> findAllByDebtshipAndIsPaidOff(Debtship debtship, boolean isPaidOff, Pageable pageable) {
+        return debtRepository.findAllByDebtshipAndIsPaidOff(debtship, isPaidOff, pageable);
     }
 
     public Debt saveDebt(Debt debt) {

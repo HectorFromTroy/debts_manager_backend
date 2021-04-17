@@ -11,5 +11,5 @@ import java.util.List;
 @Repository
 public interface DebtRepository extends CrudRepository<Debt, Long> {
     List<Debt> findAllByDebtship(Debtship debtship, Pageable pageable);
-    List<Debt> findAllByDebtshipAndAndIsPaidOff(Debtship debtship, boolean isPaidOff, Pageable pageable);
+    List<Debt> findAllByDebtshipAndIsPaidOff(Debtship debtship, boolean isPaidOff, Pageable pageable);
 }

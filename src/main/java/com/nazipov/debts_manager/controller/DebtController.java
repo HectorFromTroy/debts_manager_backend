@@ -72,7 +72,7 @@ public class DebtController {
             List<Debt> debts = null;
 
             if (active) {
-                debts = debtService.findAllByDebtshipAndAndIsPaidOff(
+                debts = debtService.findAllByDebtshipAndIsPaidOff(
                         debtship,
                         false,
                         PageRequest.of(page, 2, Sort.by("date").descending())
