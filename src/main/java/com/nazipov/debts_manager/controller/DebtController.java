@@ -8,6 +8,8 @@ import com.nazipov.debts_manager.service.SpringUser;
 import com.nazipov.debts_manager.service.debt.*;
 import com.nazipov.debts_manager.service.debtship.DebtshipService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,6 +56,7 @@ public class DebtController {
     public SampleResponseDto<?> getAllActiveDebts(
             @RequestParam(required = true) long debtshipId,
             @RequestParam(required = true) boolean active,
+            @RequestParam(required = true) int page,
             @AuthenticationPrincipal SpringUser springUser
     ) {
         Optional<Debtship> debtshipOptional = debtshipService.getDebtshipById(debtshipId);
@@ -69,9 +72,16 @@ public class DebtController {
             List<Debt> debts = null;
 
             if (active) {
-                debts = debtship.getActiveDebts();
+                debts = debtService.findAllByDebtshipAndAndIsPaidOff(
+                        debtship,
+                        false,
+                        PageRequest.of(page, 2, Sort.by("date").descending())
+                );
             } else {
-                debts = debtship.getDebts();
+                debts = debtService.findAllByDebtship(
+                        debtship,
+                        PageRequest.of(page, 2, Sort.by("date").descending())
+                );
             }
 
             return new SampleResponseDto.Builder<>()

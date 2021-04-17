@@ -24,17 +24,6 @@ public class Debtship {
     @JoinColumn(name = "debtor_id")
     private MyUser debtor;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "debtship")
-    @OrderBy("date ASC")
-    private List<Debt> debts;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "debtship")
-    @Where(clause = "is_paid_off = false")
-    @OrderBy("date ASC")
-    private List<Debt> activeDebts;
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -57,13 +46,5 @@ public class Debtship {
 
     public void setDebtor(MyUser debtor) {
         this.debtor = debtor;
-    }
-
-    public List<Debt> getDebts() {
-        return debts;
-    }
-
-    public List<Debt> getActiveDebts() {
-        return activeDebts;
     }
 }
