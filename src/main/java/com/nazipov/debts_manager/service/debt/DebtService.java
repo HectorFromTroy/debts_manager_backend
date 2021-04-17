@@ -6,6 +6,7 @@ import com.nazipov.debts_manager.repositories.DebtRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +22,10 @@ public class DebtService {
 
     public Optional<Debt> getDebtById(long debtId) {
         return debtRepository.findById(debtId);
+    }
+
+    public Iterable<Debt> getAllDebtsById(Long[] debtIds) {
+        return debtRepository.findAllById(Arrays.asList(debtIds));
     }
 
     public Debt saveDebt(Debt debt) {

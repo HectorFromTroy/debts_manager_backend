@@ -16,37 +16,37 @@ VALUES
 ( 100, 200, 200,
   'SAMAT NIYAZU',
   '10-10-20',
-  0, NULL, NULL
+  false, NULL, NULL
 ),
 ( 200, 300, 400,
   'NIYAZ DURAKU',
   '10-10-20',
-  0, NULL, NULL
+  false, NULL, NULL
 ),
 ( 300, 300, 800,
   'NIYAZ duraku',
   '10-10-20',
-  0, NULL, NULL
+  false, NULL, NULL
 ),
 ( 400, 200, 200,
   'SAMAT NIYAZU',
   '10-9-20',
-  0, NULL, NULL
+  false, NULL, NULL
 ),
 ( 500, 200, 200,
   'SAMAT NIYAZU',
   '10-4-20',
-  0, NULL, NULL
+  false, NULL, NULL
 ),
 ( 600, 200, 200,
   'SAMAT NIYAZU',
   '11-10-20',
-  200, '11-15-20', 'vernul'
+  true, '11-15-20', 'vernul'
 ),
 ( 700, 400, 400,
   'Niyaz samatu',
   '11-10-20',
-  0, null, null
+  false, null, null
 );
 
 -- INSERT INTO debt

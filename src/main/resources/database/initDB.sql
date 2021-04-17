@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS debt
     sum                 INT NOT NULL ,
     description         VARCHAR(200) ,
     date                DATE NOT NULL ,
-    repay_sum           INT DEFAULT 0,
+    is_paid_off         BOOLEAN,
     repay_date          DATE ,
     repay_description   VARCHAR(200) ,
     FOREIGN KEY (debtship_id) REFERENCES debtship (id) ON DELETE CASCADE

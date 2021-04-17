@@ -29,8 +29,8 @@ public class Debt {
     @Column(name = "date")
     private LocalDate date;
 
-    @Column(name = "repay_sum")
-    private Integer repaySum = 0;
+    @Column(name = "is_paid_off")
+    private Boolean isPaidOff = false;
 
     @Column(name = "repay_description")
     private String repayDescription;
@@ -78,14 +78,6 @@ public class Debt {
         return date;
     }
 
-    public void setRepaySum(int repaySum) {
-        this.repaySum = repaySum;
-    }
-
-    public int getRepaySum() {
-        return repaySum;
-    }
-
     public void setRepayDescription(String repayDescription) {
         this.repayDescription = repayDescription;
     }
@@ -100,5 +92,13 @@ public class Debt {
 
     public LocalDate getRepayDate() {
         return repayDate;
+    }
+
+    public void setPaidOff(Boolean paidOff) {
+        isPaidOff = paidOff;
+    }
+
+    public Boolean getPaidOff() {
+        return isPaidOff;
     }
 }

@@ -5,10 +5,7 @@ import com.nazipov.debts_manager.entities.Debt;
 import com.nazipov.debts_manager.entities.Debtship;
 import com.nazipov.debts_manager.entities.MyUser;
 import com.nazipov.debts_manager.service.SpringUser;
-import com.nazipov.debts_manager.service.debt.AddDebtRequest;
-import com.nazipov.debts_manager.service.debt.DebtService;
-import com.nazipov.debts_manager.service.debt.RepayDebtRequest;
-import com.nazipov.debts_manager.service.debt.RepaySpecificDebt;
+import com.nazipov.debts_manager.service.debt.*;
 import com.nazipov.debts_manager.service.debtship.DebtshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -44,11 +41,13 @@ public class DebtController {
                 .build();
     }
 
-    private boolean checkNoAccessOnDebt(SpringUser springUser, Debt debt) {
-        MyUser user = debt.getDebtship().getUser();
-        return !user.getId()
-                .equals(springUser.getUser().getId())
-                && user.getUsername() != null;
+    private boolean checkAccessOnDebt(SpringUser springUser, Debtship debtship) {
+        MyUser user = debtship.getUser();
+        long currentUserId = springUser.getUser().getId();
+        // Есть доступ, если должны мне или я должен не настоящему
+        return user.getId() == currentUserId
+                || (debtship.getDebtor().getId() == currentUserId
+                    && user.getUsername() == null);
     }
 
     @GetMapping("/get_debts")
@@ -91,46 +90,29 @@ public class DebtController {
     public SampleResponseDto<?> addDebt(
             @RequestBody AddDebtRequest addDebtRequest,
             @AuthenticationPrincipal SpringUser springUser) {
-
-        long currentUserId = springUser.getUser().getId();
         String description = addDebtRequest.getDescription();
         LocalDate date = addDebtRequest.getDate();
         int sum = addDebtRequest.getSum();
 
-        long[] debtshipIds = addDebtRequest.getDebtship_id();
-
         List<Debt> debtsToAdd = new ArrayList<>();
 
-        for (long debtshipId : debtshipIds) {
-            Optional<Debtship> debtshipOptional = debtshipService
-                    .getDebtshipById(debtshipId);
-            if (debtshipOptional.isPresent()) {
-                Debtship debtship = debtshipOptional.get();
-                // мне должны или я должен не настоящему юзеру
-                if (debtship.getUser().getId().equals(currentUserId)
-                        || (debtship.getDebtor().getId().equals(currentUserId)
-                            && debtship.getUser().getUsername() == null
-                        )
-                ) {
-                    Debt debt = new Debt();
-                    debt.setDebtship(debtship);
-                    debt.setDescription(description);
-                    debt.setDate(date);
-                    debt.setSum(sum);
-                    debtsToAdd.add(debt);
-                } else {
-                    return new SampleResponseDto.Builder<>()
-                            .setStatus(false)
-                            .setError("Одно или несколько отношений не принадлежат пользователю")
-                            .build();
-                }
+        for (Debtship debtship : debtshipService.getAllDebtshipById(addDebtRequest.getDebtship_id())) {
+            // мне должны или я должен не настоящему юзеру
+            if (checkAccessOnDebt(springUser, debtship)) {
+                Debt debt = new Debt();
+                debt.setDebtship(debtship);
+                debt.setDescription(description);
+                debt.setDate(date);
+                debt.setSum(sum);
+                debtsToAdd.add(debt);
             } else {
                 return new SampleResponseDto.Builder<>()
                         .setStatus(false)
-                        .setError("Нет такого отношения между пользователем и должником")
+                        .setError("Одно или несколько отношений не принадлежат пользователю")
                         .build();
             }
         }
+
         debtService.saveAllDebts(debtsToAdd);
         return SampleResponseDto.statusTrue();
     }
@@ -144,8 +126,7 @@ public class DebtController {
 
         if (debtOptional.isPresent()) {
             Debt debt = debtOptional.get();
-
-            if (checkNoAccessOnDebt(springUser, debt)) {
+            if (!checkAccessOnDebt(springUser, debt.getDebtship())) {
                 return noAccessOnDebt();
             }
             debtService.deleteDebt(debt);
@@ -157,25 +138,20 @@ public class DebtController {
 
     @PostMapping("/repay_debt")
     public SampleResponseDto<?> repayDebt(
-            @RequestBody RepaySpecificDebt repaySpecificDebt,
+            @RequestBody RepayDebtRequest repayDebtRequest,
             @AuthenticationPrincipal SpringUser springUser
     ) {
-        Optional<Debt> debtOptional = debtService.getDebtById(repaySpecificDebt.getDebtId());
-
-        if (debtOptional.isPresent()) {
-            Debt debt = debtOptional.get();
-
-            if (checkNoAccessOnDebt(springUser, debt)) {
+        List<Debt> debtsToRepay = new ArrayList<>();
+        for (Debt debt : debtService.getAllDebtsById(repayDebtRequest.getDebtIds())) {
+            if (!checkAccessOnDebt(springUser, debt.getDebtship())) {
                 return noAccessOnDebt();
             }
-
-            debt.setRepaySum(debt.getSum());
-            debt.setRepayDescription(repaySpecificDebt.getRepayDescription());
-            debt.setRepayDate(repaySpecificDebt.getRepayDate());
-            debtService.saveDebt(debt);
-            return SampleResponseDto.statusTrue();
-        } else {
-            return noSuchDebt();
+            debt.setPaidOff(true);
+            debt.setRepayDescription(repayDebtRequest.getRepayDescription());
+            debt.setRepayDate(repayDebtRequest.getRepayDate());
+            debtsToRepay.add(debt);
         }
+        debtService.saveAllDebts(debtsToRepay);
+        return SampleResponseDto.statusTrue();
     }
 }

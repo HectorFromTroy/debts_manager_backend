@@ -31,7 +31,7 @@ public class Debtship {
 
     @JsonIgnore
     @OneToMany(mappedBy = "debtship")
-    @Where(clause = "sum != repay_sum")
+    @Where(clause = "is_paid_off = false")
     @OrderBy("date ASC")
     private List<Debt> activeDebts;
 
