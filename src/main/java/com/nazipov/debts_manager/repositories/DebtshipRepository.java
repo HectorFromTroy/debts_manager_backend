@@ -1,6 +1,7 @@
 package com.nazipov.debts_manager.repositories;
 
 import com.nazipov.debts_manager.entities.Debtship;
+import com.nazipov.debts_manager.entities.MyUser;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -13,4 +14,6 @@ public interface DebtshipRepository extends CrudRepository<Debtship, Long> {
 
     @Query(value = "select * from debtship where user_id = ?1 and debtor_id = ?2", nativeQuery = true)
     public Optional<Debtship> getDebtshipByUserAndDebtorId(long userId, long debtorId);
+
+    public Optional<Debtship> findDebtshipByUserAndDebtor(MyUser user, MyUser debtor);
 }

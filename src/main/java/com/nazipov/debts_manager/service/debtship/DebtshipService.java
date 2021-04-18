@@ -23,6 +23,10 @@ public class DebtshipService {
         return debtshipRepository.getDebtshipByUserAndDebtorId(userId, debtorId);
     }
 
+    public Optional<Debtship> findDebtshipByUserAndDebtor(MyUser user, MyUser debtor) {
+        return debtshipRepository.findDebtshipByUserAndDebtor(user, debtor);
+    }
+
     public Optional<Debtship> getDebtshipById(long debtshipId) {
         return debtshipRepository.findById(debtshipId);
     }
@@ -40,5 +44,9 @@ public class DebtshipService {
         debtship.setUser(user);
         debtship.setDebtor(debtor);
         return debtshipRepository.save(debtship);
+    }
+
+    public void deleteDebtship(Debtship debtship) {
+        debtshipRepository.delete(debtship);
     }
 }

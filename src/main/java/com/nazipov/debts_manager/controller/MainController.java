@@ -32,18 +32,14 @@ public class MainController {
     }
 
     @GetMapping("/login")
-    public SampleResponseDto<?> login(HttpServletResponse response) {
+    public SampleResponseDto<?> login(
+            HttpServletResponse response,
+            @AuthenticationPrincipal SpringUser springUser
+    ) {
         // if spring security allows to get here => login was successful
-        response.setStatus(HttpServletResponse.SC_OK);
-        return SampleResponseDto.statusTrue();
-    }
-
-    @GetMapping("/user")
-    public SampleResponseDto<MyUser> getUser() {
-        Optional<MyUser> u = detailsService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         return new SampleResponseDto.Builder<MyUser>()
                 .setStatus(true)
-                .setData(u.get())
+                .setData(springUser.getUser())
                 .build();
     }
 
@@ -82,5 +78,37 @@ public class MainController {
         debtshipService.saveDebtship(user, debtor);
 
         return SampleResponseDto.statusTrue();
+    }
+
+    @GetMapping("/delete_debtor")
+    public SampleResponseDto<?> deletedDebtor(
+            @RequestParam(required = true) long debtshipId,
+            @AuthenticationPrincipal SpringUser springUser
+    ) {
+        Optional<Debtship> debtshipOptional = debtshipService.getDebtshipById(debtshipId);
+        if (debtshipOptional.isPresent()) {
+            Debtship debtship = debtshipOptional.get();
+            if (!debtship.getUser().getId().equals(springUser.getUser().getId())) {
+                return new SampleResponseDto.Builder<>()
+                        .setStatus(false)
+                        .setError("Отношение не принадлежит пользователю")
+                        .build();
+            }
+
+            debtshipService.deleteDebtship(debtship);
+
+            // Если должник не настоящий пользователь, то и его удалить
+            MyUser debtor = debtship.getDebtor();
+            if (debtor.getUsername() == null) {
+                detailsService.deleteUser(debtor);
+            }
+
+            return SampleResponseDto.statusTrue();
+        } else {
+            return new SampleResponseDto.Builder<>()
+                    .setStatus(false)
+                    .setError("Нет такого отношения")
+                    .build();
+        }
     }
 }

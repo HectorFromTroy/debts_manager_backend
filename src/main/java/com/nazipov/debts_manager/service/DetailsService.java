@@ -49,4 +49,8 @@ public class DetailsService implements UserDetailsService {
         // encode password
         return userRepository.save(user);
     }
+
+    public void deleteUser(MyUser user) {
+        userRepository.delete(user);
+    }
 }
