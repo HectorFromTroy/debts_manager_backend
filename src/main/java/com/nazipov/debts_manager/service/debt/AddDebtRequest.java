@@ -3,21 +3,21 @@ package com.nazipov.debts_manager.service.debt;
 import java.time.LocalDate;
 
 public class AddDebtRequest {
-    private final Long[] debtship_id;
+    private final Long[] debtorIds;
     private final int sum;
     private final String description;
     private final LocalDate date;
 
-    public AddDebtRequest(Long[] debtship_id, int sum, String description, LocalDate date) {
-        this.debtship_id = debtship_id;
+    public AddDebtRequest(Long[] debtorIds, int sum, String description, LocalDate date) {
+        this.debtorIds = debtorIds;
         this.sum = sum;
         this.description = description;
         this.date = date;
     }
 
 
-    public Long[] getDebtship_id() {
-        return debtship_id;
+    public Long[] getDebtorIds() {
+        return debtorIds;
     }
 
     public int getSum() {

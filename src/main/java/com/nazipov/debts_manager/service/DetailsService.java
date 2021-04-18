@@ -3,12 +3,12 @@ package com.nazipov.debts_manager.service;
 import com.nazipov.debts_manager.entities.MyUser;
 import com.nazipov.debts_manager.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -34,6 +34,10 @@ public class DetailsService implements UserDetailsService {
 
     public Optional<MyUser> findUserById(long id) {
         return userRepository.findById(id);
+    }
+
+    public List<MyUser> getUserDebtorsById(long userId) {
+        return userRepository.getUserDebtorsById(userId);
     }
 
     public Optional<MyUser> findByUsername(String username) {

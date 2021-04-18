@@ -6,10 +6,7 @@ import com.nazipov.debts_manager.repositories.DebtshipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class DebtshipService {
@@ -23,21 +20,18 @@ public class DebtshipService {
         return debtshipRepository.getDebtshipByUserAndDebtorId(userId, debtorId);
     }
 
-    public Optional<Debtship> findDebtshipByUserAndDebtor(MyUser user, MyUser debtor) {
-        return debtshipRepository.findDebtshipByUserAndDebtor(user, debtor);
+    public List<Debtship> getDebtshipsByDebtorIds(long userId, Long[] debtorIds) {
+        return debtshipRepository.getDebtshipsByUserAndDebtorIds(userId, debtorIds);
     }
 
-    public Optional<Debtship> getDebtshipById(long debtshipId) {
-        return debtshipRepository.findById(debtshipId);
-    }
-
-    public Iterable<Debtship> getAllDebtshipById(Long[] debtshipIds) {
-        return debtshipRepository.findAllById(Arrays.asList(debtshipIds));
-    }
-
-    public Optional<Set<Debtship>> getUserDebtorsById(long userId) {
-        return debtshipRepository.getUserDebtorsById(userId);
-    }
+    //TODO
+//    public Optional<Debtship> getDebtshipById(long debtshipId) {
+//        return debtshipRepository.findById(debtshipId);
+//    }
+//
+//    public Iterable<Debtship> getAllDebtshipById(Long[] debtshipIds) {
+//        return debtshipRepository.findAllById(Arrays.asList(debtshipIds));
+//    }
 
     public Debtship saveDebtship(MyUser user, MyUser debtor) {
         Debtship debtship = new Debtship();

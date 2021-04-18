@@ -54,21 +54,17 @@ public class DebtController {
 
     @GetMapping("/get_debts")
     public SampleResponseDto<?> getAllActiveDebts(
-            @RequestParam(required = true) long debtshipId,
+            @RequestParam(required = true) long debtorId,
             @RequestParam(required = true) boolean active,
             @RequestParam(required = true) int page,
             @AuthenticationPrincipal SpringUser springUser
     ) {
-        Optional<Debtship> debtshipOptional = debtshipService.getDebtshipById(debtshipId);
+        Optional<Debtship> debtshipOptional = debtshipService.getDebtshipByUserAndDebtorId(
+                springUser.getUser().getId(),
+                debtorId
+        );
         if (debtshipOptional.isPresent()) {
             Debtship debtship = debtshipOptional.get();
-            if (!debtship.getUser().getId().equals(springUser.getUser().getId())) {
-                return new SampleResponseDto.Builder<>()
-                        .setStatus(false)
-                        .setError("Отношение не принадлежит пользователю")
-                        .build();
-            }
-
             List<Debt> debts = null;
 
             if (active) {
@@ -106,21 +102,16 @@ public class DebtController {
 
         List<Debt> debtsToAdd = new ArrayList<>();
 
-        for (Debtship debtship : debtshipService.getAllDebtshipById(addDebtRequest.getDebtship_id())) {
-            // мне должны или я должен не настоящему юзеру
-            if (checkAccessOnDebt(springUser, debtship)) {
-                Debt debt = new Debt();
-                debt.setDebtship(debtship);
-                debt.setDescription(description);
-                debt.setDate(date);
-                debt.setSum(sum);
-                debtsToAdd.add(debt);
-            } else {
-                return new SampleResponseDto.Builder<>()
-                        .setStatus(false)
-                        .setError("Одно или несколько отношений не принадлежат пользователю")
-                        .build();
-            }
+        for (Debtship debtship : debtshipService.getDebtshipsByDebtorIds(
+                springUser.getUser().getId(),
+                addDebtRequest.getDebtorIds())
+        ) {
+            Debt debt = new Debt();
+            debt.setDebtship(debtship);
+            debt.setDescription(description);
+            debt.setDate(date);
+            debt.setSum(sum);
+            debtsToAdd.add(debt);
         }
 
         debtService.saveAllDebts(debtsToAdd);

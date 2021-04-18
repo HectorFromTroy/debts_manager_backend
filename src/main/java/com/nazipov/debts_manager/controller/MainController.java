@@ -9,13 +9,11 @@ import com.nazipov.debts_manager.service.debtship.AddDebtorRequest;
 import com.nazipov.debts_manager.service.debtship.DebtshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 public class MainController {
@@ -46,13 +44,8 @@ public class MainController {
     @GetMapping("/get_debtors")
     public SampleResponseDto<?> getDebtors(@AuthenticationPrincipal SpringUser springUser) {
         MyUser user = springUser.getUser();
-        Optional<Set<Debtship>> debtshipsOpt = debtshipService.getUserDebtorsById(user.getId());
-        // even if there is no debtors, optional will contain empty set anyway
-        Set<Debtship> debtships = debtshipsOpt.get();
-        Set<MyUser> debtors = debtships.stream()
-                .map(Debtship::getDebtor)
-                .collect(Collectors.toSet());
-        return new SampleResponseDto.Builder<Set<MyUser>>()
+        List<MyUser> debtors = detailsService.getUserDebtorsById(user.getId());
+        return new SampleResponseDto.Builder<List<MyUser>>()
                 .setStatus(true)
                 .setData(debtors)
                 .build();
@@ -82,19 +75,16 @@ public class MainController {
 
     @GetMapping("/delete_debtor")
     public SampleResponseDto<?> deletedDebtor(
-            @RequestParam(required = true) long debtshipId,
+            @RequestParam(required = true) long debtorId,
             @AuthenticationPrincipal SpringUser springUser
     ) {
-        Optional<Debtship> debtshipOptional = debtshipService.getDebtshipById(debtshipId);
+        Optional<Debtship> debtshipOptional = debtshipService.getDebtshipByUserAndDebtorId(
+                springUser.getUser().getId(),
+                debtorId
+        );
+
         if (debtshipOptional.isPresent()) {
             Debtship debtship = debtshipOptional.get();
-            if (!debtship.getUser().getId().equals(springUser.getUser().getId())) {
-                return new SampleResponseDto.Builder<>()
-                        .setStatus(false)
-                        .setError("Отношение не принадлежит пользователю")
-                        .build();
-            }
-
             debtshipService.deleteDebtship(debtship);
 
             // Если должник не настоящий пользователь, то и его удалить
