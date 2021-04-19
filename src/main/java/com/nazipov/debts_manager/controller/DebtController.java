@@ -1,5 +1,6 @@
 package com.nazipov.debts_manager.controller;
 
+import com.nazipov.debts_manager.dto.DebtsAndSumDto;
 import com.nazipov.debts_manager.dto.SampleResponseDto;
 import com.nazipov.debts_manager.entities.Debt;
 import com.nazipov.debts_manager.entities.Debtship;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -71,18 +73,24 @@ public class DebtController {
                 debts = debtService.findAllByDebtshipAndIsPaidOff(
                         debtship,
                         false,
-                        PageRequest.of(page, 2, Sort.by("date").descending())
+                        PageRequest.of(page, 7, Sort.by("date").descending())
                 );
             } else {
                 debts = debtService.findAllByDebtship(
                         debtship,
-                        PageRequest.of(page, 2, Sort.by("date").descending())
+                        //TODO make factory
+                        PageRequest.of(page, 7, Sort.by("date").descending())
                 );
             }
 
+            DebtsAndSumDto debtsAndSumDto = new DebtsAndSumDto(
+                    debts,
+                    debtService.getDebtsSum(debtship.getId())
+            );
+
             return new SampleResponseDto.Builder<>()
                     .setStatus(true)
-                    .setData(debts)
+                    .setData(debtsAndSumDto)
                     .build();
         } else {
             return new SampleResponseDto.Builder<>()
@@ -118,23 +126,20 @@ public class DebtController {
         return SampleResponseDto.statusTrue();
     }
 
-    @GetMapping("/delete_debt")
+    @PostMapping("/delete_debt")
     public SampleResponseDto<?> deleteDebt(
-            @RequestParam(required = true) long debtId,
+            @RequestBody Map<String, Long[]> payload,
             @AuthenticationPrincipal SpringUser springUser
     ) {
-        Optional<Debt> debtOptional = debtService.getDebtById(debtId);
-
-        if (debtOptional.isPresent()) {
-            Debt debt = debtOptional.get();
+        List<Debt> debtsToDelete = new ArrayList<>();
+        for (Debt debt : debtService.getAllDebtsById(payload.get("debtId"))) {
             if (!checkAccessOnDebt(springUser, debt.getDebtship())) {
                 return noAccessOnDebt();
             }
-            debtService.deleteDebt(debt);
-            return SampleResponseDto.statusTrue();
-        } else {
-            return noSuchDebt();
+            debtsToDelete.add(debt);
         }
+        debtService.deleteDebts(debtsToDelete);
+        return SampleResponseDto.statusTrue();
     }
 
     @PostMapping("/repay_debt")

@@ -46,7 +46,7 @@ public class DetailsService implements UserDetailsService {
 
     public MyUser saveUser(MyUser user) {
         Optional<MyUser> userFromDb = userRepository.findByUsername(user.getUsername());
-        if (userFromDb.isPresent()) {
+        if (userFromDb.isPresent() && user.getUsername() != null) {
             // user already exists
             return null;
         }

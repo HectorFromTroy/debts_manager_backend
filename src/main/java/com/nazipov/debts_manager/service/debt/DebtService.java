@@ -37,15 +37,15 @@ public class DebtService {
         return debtRepository.findAllByDebtshipAndIsPaidOff(debtship, isPaidOff, pageable);
     }
 
-    public Debt saveDebt(Debt debt) {
-        return debtRepository.save(debt);
+    public int getDebtsSum(long debtshipId) {
+        return debtRepository.getDebtsSum(debtshipId);
     }
 
     public Iterable<Debt> saveAllDebts(List<Debt> debts) {
         return debtRepository.saveAll(debts);
     }
 
-    public void deleteDebt(Debt debt) {
-        debtRepository.delete(debt);
+    public void deleteDebts(List<Debt> debts) {
+        debtRepository.deleteAll(debts);
     }
 }
