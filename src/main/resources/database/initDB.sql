@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users
     id          BIGSERIAL PRIMARY KEY ,
     username    VARCHAR(200) ,-- may be null because of non real debtors
     name        VARCHAR(200) NOT NULL ,
-    password    varchar(20) DEFAULT NULL
+    password    varchar(200) DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS debtship

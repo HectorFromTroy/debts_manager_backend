@@ -6,10 +6,3 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     database: postgresql
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: ${client_id}
-            client-secret: ${client_secret}

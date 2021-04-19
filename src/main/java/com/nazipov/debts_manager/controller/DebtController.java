@@ -33,17 +33,14 @@ public class DebtController {
         this.debtService = debtService;
     }
 
+    private PageRequest getPageRequest(int page) {
+        return PageRequest.of(page, 7, Sort.by("date").descending());
+    }
+
     private SampleResponseDto<?> noAccessOnDebt() {
         return new SampleResponseDto.Builder<>()
                 .setStatus(false)
                 .setError("У вас нет доступа к этому долгу")
-                .build();
-    }
-
-    private SampleResponseDto<?> noSuchDebt() {
-        return new SampleResponseDto.Builder<>()
-                .setStatus(false)
-                .setError("Нет такого долга")
                 .build();
     }
 
@@ -75,13 +72,12 @@ public class DebtController {
                 debts = debtService.findAllByDebtshipAndIsPaidOff(
                         debtship,
                         false,
-                        PageRequest.of(page, 7, Sort.by("date").descending())
+                        getPageRequest(page)
                 );
             } else {
                 debts = debtService.findAllByDebtship(
                         debtship,
-                        //TODO make factory
-                        PageRequest.of(page, 7, Sort.by("date").descending())
+                        getPageRequest(page)
                 );
             }
 
