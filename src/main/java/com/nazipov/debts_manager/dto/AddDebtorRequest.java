@@ -1,4 +1,4 @@
-package com.nazipov.debts_manager.service.debtship;
+package com.nazipov.debts_manager.dto;
 
 public class AddDebtorRequest {
     private final int debtorId;

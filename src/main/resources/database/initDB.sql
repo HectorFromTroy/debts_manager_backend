@@ -19,15 +19,11 @@ CREATE TABLE IF NOT EXISTS debt
 (
     id                  BIGSERIAL PRIMARY KEY ,
     debtship_id         BIGSERIAL NOT NULL ,
---     user_id             BIGSERIAL NOT NULL ,
---     debtor_id           BIGSERIAL NOT NULL ,
     sum                 INT NOT NULL ,
     description         VARCHAR(200) ,
-    date                DATE NOT NULL ,
+    date                TIMESTAMP NOT NULL ,
     is_paid_off         BOOLEAN,
-    repay_date          DATE ,
+    repay_date          TIMESTAMP ,
     repay_description   VARCHAR(200) ,
     FOREIGN KEY (debtship_id) REFERENCES debtship (id) ON DELETE CASCADE
---     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ,
---     FOREIGN KEY (debtor_id) REFERENCES users (id) ON DELETE CASCADE
 );

@@ -1,14 +1,14 @@
-package com.nazipov.debts_manager.service.debt;
+package com.nazipov.debts_manager.dto;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class AddDebtRequest {
     private final Long[] debtorIds;
     private final int sum;
     private final String description;
-    private final LocalDate date;
+    private final LocalDateTime date;
 
-    public AddDebtRequest(Long[] debtorIds, int sum, String description, LocalDate date) {
+    public AddDebtRequest(Long[] debtorIds, int sum, String description, LocalDateTime date) {
         this.debtorIds = debtorIds;
         this.sum = sum;
         this.description = description;
@@ -28,7 +28,7 @@ public class AddDebtRequest {
         return description;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "debt")
@@ -25,7 +26,7 @@ public class Debt {
     private String description;
 
     @Column(name = "date")
-    private LocalDate date;
+    private LocalDateTime date;
 
     @Column(name = "is_paid_off")
     private Boolean isPaidOff = false;
@@ -34,7 +35,7 @@ public class Debt {
     private String repayDescription;
 
     @Column(name = "repay_date")
-    private LocalDate repayDate;
+    private LocalDateTime repayDate;
 
     public Long getId() {
         return id;
@@ -68,11 +69,11 @@ public class Debt {
         return description;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
@@ -84,11 +85,11 @@ public class Debt {
         return repayDescription;
     }
 
-    public void setRepayDate(LocalDate repayDate) {
+    public void setRepayDate(LocalDateTime repayDate) {
         this.repayDate = repayDate;
     }
 
-    public LocalDate getRepayDate() {
+    public LocalDateTime getRepayDate() {
         return repayDate;
     }
 

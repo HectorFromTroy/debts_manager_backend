@@ -1,13 +1,13 @@
-package com.nazipov.debts_manager.service.debt;
+package com.nazipov.debts_manager.dto;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class RepayDebtRequest {
     private final Long[] debtIds;
     private final String repayDescription;
-    private final LocalDate repayDate;
+    private final LocalDateTime repayDate;
 
-    public RepayDebtRequest(Long[] debtIds, String repayDescription, LocalDate repayDate) {
+    public RepayDebtRequest(Long[] debtIds, String repayDescription, LocalDateTime repayDate) {
         this.debtIds = debtIds;
         this.repayDescription = repayDescription;
         this.repayDate = repayDate;
@@ -17,7 +17,7 @@ public class RepayDebtRequest {
         return repayDescription;
     }
 
-    public LocalDate getRepayDate() {
+    public LocalDateTime getRepayDate() {
         return repayDate;
     }
 

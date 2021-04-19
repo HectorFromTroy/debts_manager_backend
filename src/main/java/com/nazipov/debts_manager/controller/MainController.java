@@ -5,7 +5,7 @@ import com.nazipov.debts_manager.entities.Debtship;
 import com.nazipov.debts_manager.entities.MyUser;
 import com.nazipov.debts_manager.service.DetailsService;
 import com.nazipov.debts_manager.service.SpringUser;
-import com.nazipov.debts_manager.service.debtship.AddDebtorRequest;
+import com.nazipov.debts_manager.dto.AddDebtorRequest;
 import com.nazipov.debts_manager.service.debtship.DebtshipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

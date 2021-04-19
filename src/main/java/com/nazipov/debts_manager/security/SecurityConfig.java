@@ -2,6 +2,7 @@ package com.nazipov.debts_manager.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nazipov.debts_manager.dto.SampleResponseDto;
+import com.nazipov.debts_manager.entities.MyUser;
 import com.nazipov.debts_manager.service.DetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -62,19 +63,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(detailsService).passwordEncoder(new CustomPasswordEncoder());//.passwordEncoder(User.PASSWORD_ENCODER);
+        auth.userDetailsService(detailsService).passwordEncoder(MyUser.PASSWORD_ENCODER);
     }
 
-    public static class CustomPasswordEncoder implements PasswordEncoder {
-        @Override
-        public String encode(CharSequence rawPassword) {
-            return String.valueOf(rawPassword);
-        }
-        @Override
-        public boolean matches(CharSequence rawPassword, String encodedPassword) {
-            return String.valueOf(rawPassword).equals(encodedPassword);
-        }
-    }
+//    public static class CustomPasswordEncoder implements PasswordEncoder {
+//        @Override
+//        public String encode(CharSequence rawPassword) {
+//            return String.valueOf(rawPassword);
+//        }
+//        @Override
+//        public boolean matches(CharSequence rawPassword, String encodedPassword) {
+//            return String.valueOf(rawPassword).equals(encodedPassword);
+//        }
+//    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

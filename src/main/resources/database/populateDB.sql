@@ -48,21 +48,3 @@ VALUES
   '11-10-20',
   false, null, null
 );
-
--- INSERT INTO debt
--- VALUES
--- ( 1, 100, 300, 200,
--- 'SAMAT NIYAZU',
---  '10-10-20',
---  NULL, NULL, NULL
--- ),
--- ( 2, 200, 100, 400,
---   'NIYAZ DURAKU',
---   '10-10-20',
---   NULL, NULL, NULL
--- ),
--- ( 3, 200, 100, 800,
---   'NIYAZ duraku',
---   '10-10-20',
---   NULL, NULL, NULL
--- );

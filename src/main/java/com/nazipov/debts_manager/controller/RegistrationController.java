@@ -1,7 +1,7 @@
 package com.nazipov.debts_manager.controller;
 
 import com.nazipov.debts_manager.dto.SampleResponseDto;
-import com.nazipov.debts_manager.service.registration.RegistrationRequest;
+import com.nazipov.debts_manager.dto.RegistrationRequest;
 import com.nazipov.debts_manager.service.registration.RegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

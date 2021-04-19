@@ -1,4 +1,4 @@
-package com.nazipov.debts_manager.service.registration;
+package com.nazipov.debts_manager.dto;
 
 public class RegistrationRequest {
     private final String username;

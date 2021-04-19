@@ -1,6 +1,8 @@
 package com.nazipov.debts_manager.controller;
 
+import com.nazipov.debts_manager.dto.AddDebtRequest;
 import com.nazipov.debts_manager.dto.DebtsAndSumDto;
+import com.nazipov.debts_manager.dto.RepayDebtRequest;
 import com.nazipov.debts_manager.dto.SampleResponseDto;
 import com.nazipov.debts_manager.entities.Debt;
 import com.nazipov.debts_manager.entities.Debtship;
@@ -14,7 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -83,9 +85,10 @@ public class DebtController {
                 );
             }
 
+            Optional<Integer> sumOptional = debtService.getDebtsSum(debtship.getId());
             DebtsAndSumDto debtsAndSumDto = new DebtsAndSumDto(
                     debts,
-                    debtService.getDebtsSum(debtship.getId())
+                    sumOptional.orElse(0)
             );
 
             return new SampleResponseDto.Builder<>()
@@ -105,7 +108,7 @@ public class DebtController {
             @RequestBody AddDebtRequest addDebtRequest,
             @AuthenticationPrincipal SpringUser springUser) {
         String description = addDebtRequest.getDescription();
-        LocalDate date = addDebtRequest.getDate();
+        LocalDateTime date = addDebtRequest.getDate();
         int sum = addDebtRequest.getSum();
 
         List<Debt> debtsToAdd = new ArrayList<>();

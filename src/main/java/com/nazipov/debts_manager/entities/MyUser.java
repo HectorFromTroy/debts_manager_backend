@@ -55,6 +55,6 @@ public class MyUser {
     }
 
     public void setPassword(String p) {
-        password = p;//PASSWORD_ENCODER.encode(p);
+        password = PASSWORD_ENCODER.encode(p);
     }
 }

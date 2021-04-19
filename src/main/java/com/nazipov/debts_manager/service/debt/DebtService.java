@@ -15,14 +15,9 @@ import java.util.Optional;
 public class DebtService {
     private final DebtRepository debtRepository;
 
-
     @Autowired
     public DebtService(DebtRepository debtRepository) {
         this.debtRepository = debtRepository;
-    }
-
-    public Optional<Debt> getDebtById(long debtId) {
-        return debtRepository.findById(debtId);
     }
 
     public Iterable<Debt> getAllDebtsById(Long[] debtIds) {
@@ -37,7 +32,7 @@ public class DebtService {
         return debtRepository.findAllByDebtshipAndIsPaidOff(debtship, isPaidOff, pageable);
     }
 
-    public int getDebtsSum(long debtshipId) {
+    public Optional<Integer> getDebtsSum(long debtshipId) {
         return debtRepository.getDebtsSum(debtshipId);
     }
 

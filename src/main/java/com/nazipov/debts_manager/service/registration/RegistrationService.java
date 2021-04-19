@@ -1,5 +1,6 @@
 package com.nazipov.debts_manager.service.registration;
 
+import com.nazipov.debts_manager.dto.RegistrationRequest;
 import com.nazipov.debts_manager.entities.MyUser;
 import com.nazipov.debts_manager.service.DetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
